@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
             $question2 = $sheet->getCell($columns['question2'] . $row)->getValue();
             $question3 = $sheet->getCell($columns['question3'] . $row)->getValue();
             $question4 = $sheet->getCell($columns['question4'] . $row)->getValue();
-            $question5 = $sheet->getCell($columns['question5'] . $row)->getValue();
+            $question5 = $sheet->getCell($columns['question5'] . $row)->getFormattedValue();
             $description = $sheet->getCell($columns['description'] . $row)->getValue();
             $overview = $sheet->getCell($columns['_OVV'] . $row)->getCalculatedValue();
             $check_in = $sheet->getCell($columns['_IN'] . $row)->getCalculatedValue();
