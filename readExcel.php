@@ -128,7 +128,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
             }
 
 
-            if ($pposmId !== null) {
+            if ($pposmId !== null || $status == 'Thành công') {
 
                 //CẬP NHẬT TRẠNG THÁI THÀNH CÔNG
                 $updateStatus = "UPDATE stores SET status = 'TC' WHERE storeCode = '$storeCode' ";
