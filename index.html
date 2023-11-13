@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Excel File Upload</title>
 
-    <!-- Add Bootstrap CSS link -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
 </head>
@@ -19,11 +18,15 @@
             </div>
             <div class="card-body">
                 <form action="readExcel.php" method="post" enctype="multipart/form-data">
-                    <button type="button" class="btn btn-info mr-2" onclick="downloadTemplate()">Download Template</button>
+                    <button type="button" class="btn btn-info mr-2" onclick="downloadTemplate()">Download
+                        Template</button>
                     <div class="form-group">
                         <label for="excelFile">Choose an Excel file:</label>
                         <input type="file" class="form-control-file" name="excelFile" id="excelFile" accept=".xlsx"
-                            required>
+                            required type="file">
+                    </div>
+                    <div id="loadingIndicator" style="display: none;">
+                        <img src="loading.gif">
                     </div>
                     <button type="button" class="btn btn-primary" onclick="fetchResults()">Upload and Process</button>
                     <button type="button" class="btn btn-secondary mr-2" onclick="reloadResults()">Reload</button>
@@ -31,7 +34,6 @@
             </div>
         </div>
 
-        <!-- Display Results Table -->
         <div class="mt-4">
             <h5>Results</h5>
             <table class="table table-bordered">
@@ -43,80 +45,99 @@
                     </tr>
                 </thead>
                 <tbody id="resultsTableBody">
-                    <!-- Results will be dynamically added here -->
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Add Bootstrap JS and Popper.js links (required for some Bootstrap features) -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.8/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <!-- Add your custom JavaScript -->
+    <script src="Includes/Classes/PHPExcel/IOFactory.php"></script>
+
     <script>
-         function downloadTemplate() {
-        // Provide the path to the template file
-        const templatePath = './template.xlsx';
+        // Function to download template
+        function downloadTemplate() {
 
-        // Create a link element
-        const link = document.createElement('a');
+            // Provide the path to the template file
+            const templatePath = 'template.xlsx';
 
-        // Set the link's attributes
-        link.href = templatePath;
-        link.target = '_blank'; // Open in a new tab
-        link.download = 'template.xlsx'; // Set the download file name
+            // Create a link element
+            const link = document.createElement('a');
 
-        // Append the link to the body and trigger the click event
-        document.body.appendChild(link);
-        link.click();
+            // Set the link's attributes
+            link.href = templatePath;
+            link.target = '_blank'; // Open in a new tab
+            link.download = 'template.xlsx'; // Set the download file name
 
-        // Remove the link from the body
-        document.body.removeChild(link);
-    }
+            // Append the link to the body and trigger the click event
+            document.body.appendChild(link);
+            link.click();
+
+            // Remove the link from the body
+            document.body.removeChild(link);
+        }
+
+        // Function to reload results
         function reloadResults() {
-        // Clear the table by setting the innerHTML of the table body to an empty string
-        document.getElementById('resultsTableBody').innerHTML = '';
-
-        // Optionally, you can also clear the file input
-        document.getElementById('excelFile').value = '';
+            // Clear the table by setting the innerHTML of the table body to an empty string
+            document.getElementById('resultsTableBody').innerHTML = "";
+            document.getElementById('excelFile').value = '';
         }
 
         // Function to fetch and display results
         function fetchResults() {
-            // Lấy file từ ô input
-            const fileInput = document.getElementById('excelFile');
-            const file = fileInput.files[0];
+            // Display the loading indicator
+            document.getElementById('loadingIndicator').style.display = 'block';
 
-            // Tạo đối tượng FormData để đóng gói dữ liệu
-            const formData = new FormData();
-            formData.append('excelFile', file);
+            // Get the form data
+            const formData = new FormData(document.querySelector('form'));
 
+            // Send a POST request to the server
             fetch('readExcel.php', {
                 method: 'POST',
-                body: formData
+                body: formData,
             })
                 .then(response => response.json())
                 .then(data => {
-                    // Populate the results table with data
-                    const resultsTableBody = document.getElementById('resultsTableBody');
-                    data.forEach(result => {
-                        const row = resultsTableBody.insertRow();
-                        const cell1 = row.insertCell(0);
-                        const cell2 = row.insertCell(1);
-                        const cell3 = row.insertCell(2);
+                    // Hide the loading indicator
+                    document.getElementById('loadingIndicator').style.display = 'none';
 
-                        cell1.textContent = result.storeCode;
-                        cell2.textContent = result.StoreId;
-                        cell3.textContent = result.Updated;
-                    });
+                    // Clear the table
+                    document.getElementById('resultsTableBody').innerHTML = '';
+
+                    // Check if there are results
+                    if (data.length > 0) {
+                        // Loop through the results and append rows to the table
+                        data.forEach(result => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                    <td>${result.storeCode}</td>
+                    <td>${result.StoreId}</td>
+                    <td>${result.Updated}</td>
+                `;
+                            document.getElementById('resultsTableBody').appendChild(row);
+                        });
+                    } else {
+                        // If no results, display a message in the table
+                        const row = document.createElement('tr');
+                        row.innerHTML = '<td colspan="3">No results found</td>';
+                        document.getElementById('resultsTableBody').appendChild(row);
+                    }
                 })
-                .catch(error => console.error('Error fetching results:', error));
-        }
-        // Gọi hàm fetchResults() để hiển thị kết quả khi trang được tải
-        window.onload = fetchResults;
+                .catch(error => {
+                    console.error('Error:', error);
 
+                    // Hide the loading indicator
+                    document.getElementById('loadingIndicator').style.display = 'none';
+
+                    // Display an error message in the table
+                    const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="3">An error occurred</td>';
+                    document.getElementById('resultsTableBody').appendChild(row);
+                });
+        }
     </script>
 </body>
 
