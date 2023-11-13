@@ -92,6 +92,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
 
             $sqlS = "SELECT * FROM store_images WHERE storeId = '$StoreId' and typeCode = 'overview' ";
             $sqlF = "SELECT * FROM store_images WHERE storeId = '$StoreId'";
+            $completeReport = 'UPDATE stores SET isDone = 1';
+           
             if ($conn->query($sqlS) == true) {
                 $result = $conn->query($sqlS);
                 while ($value = $result->fetch_assoc()) {
@@ -183,6 +185,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                         if ($hotzone2 != null && $trimm7 != null) {
                             insertImageIntoStore($conn, $StoreId, 'storeImages/' . $hotzone2 . '.jpg', 'hotzone', $lat, $long, '-1');
                         }
+                        $conn->query($completeReport);
                     } else if ($conn->query($sql5) == true) {
 
                         //posm1
@@ -215,6 +218,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                         if ($hotzone2 != null && $trimm7 != null) {
                             insertImageIntoStore($conn, $StoreId, 'storeImages/' . $hotzone2 . '.jpg', 'hotzone', $lat, $long, '-1');
                         }
+                        $conn->query($completeReport);
                     }
                 }
                 $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'Data'];
@@ -255,7 +259,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                     }
 
                     $updateStatus .= ", note = '$note' WHERE storeCode = '$storeCode'";
-                    $conn->query($updateStatus) === TRUE;
+                    $conn->query($updateStatus);
+                    $conn->query($completeReport);
                 }
                 $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'Status'];
             }
