@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel File Upload</title>
+
+    <!-- Add Bootstrap CSS link -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Excel File Upload</h5>
+            </div>
+            <div class="card-body">
+                <form action="readExcel.php" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="excelFile">Choose an Excel file:</label>
+                        <input type="file" class="form-control-file" name="excelFile" id="excelFile" accept=".xlsx"
+                            required>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="fetchResults()">Upload and Process</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Display Results Table -->
+        <div class="mt-4">
+            <h5>Results</h5>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">storeCode</th>
+                        <th scope="col">StoreId</th>
+                        <th scope="col">Updated</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTableBody">
+                    <!-- Results will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Bootstrap JS and Popper.js links (required for some Bootstrap features) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.8/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Add your custom JavaScript -->
+    <script>
+        // Function to fetch and display results
+        function fetchResults() {
+            // Lấy file từ ô input
+            const fileInput = document.getElementById('excelFile');
+            const file = fileInput.files[0];
+
+            // Tạo đối tượng FormData để đóng gói dữ liệu
+            const formData = new FormData();
+            formData.append('excelFile', file);
+
+            fetch('readExcel.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Populate the results table with data
+                    const resultsTableBody = document.getElementById('resultsTableBody');
+                    data.forEach(result => {
+                        const row = resultsTableBody.insertRow();
+                        const cell1 = row.insertCell(0);
+                        const cell2 = row.insertCell(1);
+                        const cell3 = row.insertCell(2);
+
+                        cell1.textContent = result.storeCode;
+                        cell2.textContent = result.StoreId;
+                        cell3.textContent = result.Updated;
+                    });
+                })
+                .catch(error => console.error('Error fetching results:', error));
+        }
+        // Gọi hàm fetchResults() để hiển thị kết quả khi trang được tải
+        window.onload = fetchResults;
+
+    </script>
+</body>
+
+</html>
