@@ -85,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
 
             if ($result->num_rows > 0) {
                 while ($value = $result->fetch_assoc()) {
-                   // echo "<br/>id: " . $value['id'] . " va storename: " . $value['storeName'];
+                    // echo "<br/>id: " . $value['id'] . " va storename: " . $value['storeName'];
                     $StoreId = $value['id'];
                 }
             }
@@ -93,7 +93,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
             $sqlS = "SELECT * FROM store_images WHERE storeId = '$StoreId' and typeCode = 'overview' ";
             $sqlF = "SELECT * FROM store_images WHERE storeId = '$StoreId'";
             $completeReport = 'UPDATE stores SET isDone = 1';
-           
+
             if ($conn->query($sqlS) == true) {
                 $result = $conn->query($sqlS);
                 while ($value = $result->fetch_assoc()) {
@@ -178,12 +178,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                         //hotzone
                         $trimm6 = ($hotzone1 !== null) ? str_replace(' ', '', $hotzone1) : null;
                         if ($hotzone1 != null && $trimm6 != null) {
-                            insertImageIntoStore($conn, $StoreId, 'storeImages/' . $hotzone1 . '.jpg', 'hotzone', $lat, $long, '-1');
+                            insertImageIntoStore($conn, $StoreId, 'storeImages/' . $hotzone1 . '.jpg', 'hot_zone', $lat, $long, '-1');
                         }
                         //hotzone
                         $trimm7 = ($hotzone2 !== null) ? str_replace(' ', '', $hotzone2) : null;
                         if ($hotzone2 != null && $trimm7 != null) {
-                            insertImageIntoStore($conn, $StoreId, 'storeImages/' . $hotzone2 . '.jpg', 'hotzone', $lat, $long, '-1');
+                            insertImageIntoStore($conn, $StoreId, 'storeImages/' . $hotzone2 . '.jpg', 'hot_zone', $lat, $long, '-1');
                         }
                         $conn->query($completeReport);
                     } else if ($conn->query($sql5) == true) {
@@ -211,12 +211,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                         //hotzone
                         $trimm6 = ($hotzone1 !== null) ? str_replace(' ', '', $hotzone1) : null;
                         if ($hotzone1 != null && $trimm6 != null) {
-                            insertImageIntoStore($conn, $StoreId, 'storeImages/' . $hotzone1 . '.jpg', 'hotzone', $lat, $long, '-1');
+                            insertImageIntoStore($conn, $StoreId, 'storeImages/' . $hotzone1 . '.jpg', 'hot_zone', $lat, $long, '-1');
                         }
                         //hotzone
                         $trimm7 = ($hotzone2 !== null) ? str_replace(' ', '', $hotzone2) : null;
                         if ($hotzone2 != null && $trimm7 != null) {
-                            insertImageIntoStore($conn, $StoreId, 'storeImages/' . $hotzone2 . '.jpg', 'hotzone', $lat, $long, '-1');
+                            insertImageIntoStore($conn, $StoreId, 'storeImages/' . $hotzone2 . '.jpg', 'hot_zone', $lat, $long, '-1');
                         }
                         $conn->query($completeReport);
                     }
@@ -227,7 +227,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
 
                 $sql = "SELECT * FROM stores WHERE storeCode = '$storeCode'";
                 $result = $conn->query($sql);
-               
+
 
                 if ($result->num_rows > 0) {
                     // Use a WHERE clause to specify which row to update
@@ -263,9 +263,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                     $conn->query($completeReport);
                 }
                 $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'Status'];
+            } else if ($status = 'update') {
+
+                $sql = "SELECT * FROM store_images WHERE storeId = '$StoreId'";
+                if ($conn->query($sql) == TRUE) {
+                    //overview
+                    $trimmov = ($overview !== null) ? str_replace(' ', '', $overview) : null;
+                    if ($overview != null && $trimmov != null) {
+                        insertImageIntoStore($conn, $StoreId, 'storeImages/' . $overview . '.jpg', 'overview', $lat, $long, '-1');
+                    }
+                    //check_in
+                    $trimm0 = ($check_in !== null) ? str_replace(' ', '', $check_in) : null;
+                    if ($check_in != null && $trimm0 != null) {
+                        insertImageIntoStore($conn, $StoreId, 'storeImages/' . $check_in . '.jpg', 'check_in', $lat, $long, '-1');
+                    }
+                    //check_out
+                    $trimm1 = ($check_out !== null) ? str_replace(' ', '', $check_out) : null;
+                    if ($check_out != null && $trimm1 != null) {
+                        insertImageIntoStore($conn, $StoreId, 'storeImages/' . $check_out . '.jpg', 'check_out', $lat, $long, '-1');
+                    }
+                    //posm1
+                    $trimm2 = ($posm1 !== null) ? str_replace(' ', '', $posm1) : null;
+                    if ($posm1 != null && $trimm2 != null) {
+                        insertImageIntoStore($conn, $StoreId, 'storeImages/' . $posm1 . '.jpg', 'posm', $lat, $long, $pposmId);
+                    }
+                    //posm2
+                    $trimm3 = ($posm2 !== null) ? str_replace(' ', '', $posm2) : null;
+                    if ($posm2 != null && $trimm3 != null) {
+                        insertImageIntoStore($conn, $StoreId, 'storeImages/' . $posm2 . '.jpg', 'posm', $lat, $long, $pposmId);
+                    }
+                    //fee_info
+                    $trimm4 = ($fee_info1 !== null) ? str_replace(' ', '', $fee_info1) : null;
+                    if ($fee_info1 != null && $trimm4 != null) {
+                        insertImageIntoStore($conn, $StoreId, 'storeImages/' . $fee_info1 . '.jpg', 'fee_info', $lat, $long, '-1');
+                    }
+                    //fee_info
+                    $trimm5 = ($fee_info2 !== null) ? str_replace(' ', '', $fee_info2) : null;
+                    if ($fee_info2 != null && $trimm5 != null) {
+                        insertImageIntoStore($conn, $StoreId, 'storeImages/' . $fee_info2 . '.jpg', 'fee_info', $lat, $long, '-1');
+                    }
+                    //hotzone
+                    $trimm6 = ($hotzone1 !== null) ? str_replace(' ', '', $hotzone1) : null;
+                    if ($hotzone1 != null && $trimm6 != null) {
+                        insertImageIntoStore($conn, $StoreId, 'storeImages/' . $hotzone1 . '.jpg', 'hot_zone', $lat, $long, '-1');
+                    }
+                    //hotzone
+                    $trimm7 = ($hotzone2 !== null) ? str_replace(' ', '', $hotzone2) : null;
+                    if ($hotzone2 != null && $trimm7 != null) {
+                        insertImageIntoStore($conn, $StoreId, 'storeImages/' . $hotzone2 . '.jpg', 'hotzone', $lat, $long, '-1');
+                    }
+                    $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'Update Info'];
+                }
+
             }
         }
-       // Return the results as JSON (you can modify this based on your needs)
+        // Return the results as JSON (you can modify this based on your needs)
         header('Content-Type: application/json');
         echo json_encode($results);
         exit();
