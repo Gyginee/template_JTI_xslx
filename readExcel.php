@@ -49,6 +49,56 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                 return false; // Insertion failed
             }
         }
+        function updatePosm($conn, $storeId, $posmId, $question1, $question2, $question3, $question4, $question5, $description) {
+            // Build the SET part of the SQL query dynamically based on the provided values
+            $setClause = '';
+        
+            $fields = array(
+                'question1' => $question1,
+                'question2' => $question2,
+                'question3' => $question3,
+                'question4' => $question4,
+                'question5' => $question5,
+                'description' => $description
+            );
+        
+            foreach ($fields as $field => $value) {
+                // Check if the value is not empty or null, then include it in the set clause
+                if ($value !== '' && $value !== null) {
+                    $setClause .= "$field = ?, ";
+                }
+            }
+        
+            // Remove the trailing comma
+            $setClause = rtrim($setClause, ', ');
+        
+            // Prepare the SQL update statement
+            $sqlUpdate = $conn->prepare("UPDATE store_mapping_pposms 
+                SET $setClause 
+                WHERE storeId = ? AND pposmId = ?");
+            
+            // Build an array of values for binding
+            $bindValues = array_values(array_filter($fields, function ($value) {
+                return $value !== '' && $value !== null;
+            }));
+        
+            // Append storeId and posmId to the binding values
+            $bindValues[] = $storeId;
+            $bindValues[] = $posmId;
+        
+            // Bind parameters dynamically
+            $bindTypes = str_repeat('s', count($bindValues));
+            $sqlUpdate->bind_param($bindTypes, ...$bindValues);
+        
+            // Execute the query
+            if ($sqlUpdate->execute()) {
+                return true; // Successful update
+            } else {
+                // Return the error message for better error handling
+                return "Error: " . $sqlUpdate->error;
+            }
+        }
+        
 
         // Now you can use these column positions to retrieve data from the sheet
         $maxRow = $sheet->getHighestRow();
@@ -92,7 +142,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
 
             $sqlS = "SELECT * FROM store_images WHERE storeId = '$StoreId' and typeCode = 'overview' ";
             $sqlF = "SELECT * FROM store_images WHERE storeId = '$StoreId'";
-            $completeReport = 'UPDATE stores SET isDone = 1';
+            $completeReport = "UPDATE stores SET isDone = 1 WHERE storeId = '$StoreId'";
 
             if ($conn->query($sqlS) == true) {
                 $result = $conn->query($sqlS);
@@ -130,7 +180,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
             }
 
 
-            if ($pposmId !== null || $status == 'Thành công') {
+            if (($pposmId !== null && $status !== 'Update') || $status == 'Thành công') {
 
                 //CẬP NHẬT TRẠNG THÁI THÀNH CÔNG
                 $updateStatus = "UPDATE stores SET status = 'TC' WHERE storeCode = '$storeCode' ";
@@ -263,8 +313,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                     $conn->query($completeReport);
                 }
                 $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'Status'];
-            } else if ($status = 'update') {
+            } else if ($status === 'Update') {
 
+                $sql_posm = "SELECT * FROM store_mapping_pposms WHERE storeId = '$StoreId' AND pposmId = '$pposmId'";
+                if ($conn->query($sql_posm)== TRUE ) {
+                    $completePOSM = "UPDATE store_mapping_pposms SET active = 0 WHERE storeId = '$StoreId' AND pposmId = '$pposmId'";
+                    $conn->query($completePOSM);
+                    $trimm1 = ($question1 !== null) ? str_replace(' ', '', $question1) : null;
+                    $trimm2 = ($question2 !== null) ? str_replace(' ', '', $question2) : null;
+                    $trimm3 = ($question3 !== null) ? str_replace(' ', '', $question3) : null;
+                    $trimm4 = ($question4 !== null) ? str_replace(' ', '', $question4) : null;
+                    $trimm5 = ($question5 !== null) ? str_replace(' ', '', $question5) : null;
+                    $trimDescription = ($description !== null) ? str_replace(' ', '', $description) : null;
+                    
+                    // Check if any of the fields are not null and not an empty string
+                    if (($question1 !== null && $trimm1 !== null) ||
+                        ($question2 !== null && $trimm2 !== null) ||
+                        ($question3 !== null && $trimm3 !== null) ||
+                        ($question4 !== null && $trimm4 !== null) ||
+                        ($question5 !== null && $trimm5 !== null) ||
+                        ($description !== null && $trimDescription !== null)) {
+                    
+                        updatePosm($conn, $StoreId, $pposmId, $question1, $question2, $question3, $question4, $question5, $description);
+                    }
+                }
                 $sql = "SELECT * FROM store_images WHERE storeId = '$StoreId'";
                 if ($conn->query($sql) == TRUE) {
                     //overview
