@@ -2,12 +2,11 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Excel File Upload</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -18,18 +17,27 @@
             </div>
             <div class="card-body">
                 <form action="readExcel.php" method="post" enctype="multipart/form-data">
-                    <button type="button" class="btn btn-info mr-2" onclick="downloadTemplate()">Download
-                        Template</button>
+                    <button type="button" class="btn btn-info mr-2" onclick="downloadTemplate()">
+                        Download Template
+                    </button>
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#exampleModal">
+                        Documention
+                    </button>
                     <div class="form-group">
                         <label for="excelFile">Choose an Excel file:</label>
                         <input type="file" class="form-control-file" name="excelFile" id="excelFile" accept=".xlsx"
-                            required type="file">
+                            required type="file" />
                     </div>
-                    <div id="loadingIndicator" style="display: none;">
-                        <img src="loading.gif">
+                    <div id="loadingIndicator" style="display: none">
+                        <img src="loading.gif" />
                     </div>
-                    <button type="button" class="btn btn-primary" onclick="fetchResults()">Upload and Process</button>
-                    <button type="button" class="btn btn-secondary mr-2" onclick="reloadResults()">Reload</button>
+                    <button type="button" class="btn btn-primary" onclick="fetchResults()">
+                        Upload and Process
+                    </button>
+                    <button type="button" class="btn btn-secondary mr-2" onclick="reloadResults()">
+                        Reload
+                    </button>
                 </form>
             </div>
         </div>
@@ -44,8 +52,7 @@
                         <th scope="col">Updated</th>
                     </tr>
                 </thead>
-                <tbody id="resultsTableBody">
-                </tbody>
+                <tbody id="resultsTableBody"></tbody>
             </table>
         </div>
     </div>
@@ -54,22 +61,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-   
-
     <script>
         // Function to download template
         function downloadTemplate() {
-
             // Provide the path to the template file
-            const templatePath = 'template.xlsx';
+            const templatePath = "template.xlsx";
 
             // Create a link element
-            const link = document.createElement('a');
+            const link = document.createElement("a");
 
             // Set the link's attributes
             link.href = templatePath;
-            link.target = '_blank'; // Open in a new tab
-            link.download = 'template.xlsx'; // Set the download file name
+            link.target = "_blank"; // Open in a new tab
+            link.download = "template.xlsx"; // Set the download file name
 
             // Append the link to the body and trigger the click event
             document.body.appendChild(link);
@@ -82,63 +86,93 @@
         // Function to reload results
         function reloadResults() {
             // Clear the table by setting the innerHTML of the table body to an empty string
-            document.getElementById('resultsTableBody').innerHTML = "";
-            document.getElementById('excelFile').value = '';
+            document.getElementById("resultsTableBody").innerHTML = "";
+            document.getElementById("excelFile").value = "";
         }
 
         // Function to fetch and display results
         function fetchResults() {
             // Display the loading indicator
-            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById("loadingIndicator").style.display = "block";
 
             // Get the form data
-            const formData = new FormData(document.querySelector('form'));
+            const formData = new FormData(document.querySelector("form"));
 
             // Send a POST request to the server
-            fetch('readExcel.php', {
-                method: 'POST',
+            fetch("readExcel.php", {
+                method: "POST",
                 body: formData,
             })
-                .then(response => response.json())
-                .then(data => {
+                .then((response) => response.json())
+                .then((data) => {
                     // Hide the loading indicator
-                    document.getElementById('loadingIndicator').style.display = 'none';
+                    document.getElementById("loadingIndicator").style.display = "none";
 
                     // Clear the table
-                    document.getElementById('resultsTableBody').innerHTML = '';
+                    document.getElementById("resultsTableBody").innerHTML = "";
 
                     // Check if there are results
                     if (data.length > 0) {
                         // Loop through the results and append rows to the table
-                        data.forEach(result => {
-                            const row = document.createElement('tr');
+                        data.forEach((result) => {
+                            const row = document.createElement("tr");
                             row.innerHTML = `
                     <td>${result.storeCode}</td>
                     <td>${result.StoreId}</td>
                     <td>${result.Updated}</td>
                 `;
-                            document.getElementById('resultsTableBody').appendChild(row);
+                            document.getElementById("resultsTableBody").appendChild(row);
                         });
                     } else {
                         // If no results, display a message in the table
-                        const row = document.createElement('tr');
+                        const row = document.createElement("tr");
                         row.innerHTML = '<td colspan="3">No results found</td>';
-                        document.getElementById('resultsTableBody').appendChild(row);
+                        document.getElementById("resultsTableBody").appendChild(row);
                     }
                 })
-                .catch(error => {
-                    console.error('Error:', error);
+                .catch((error) => {
+                    console.error("Error:", error);
 
                     // Hide the loading indicator
-                    document.getElementById('loadingIndicator').style.display = 'none';
+                    document.getElementById("loadingIndicator").style.display = "none";
 
                     // Display an error message in the table
-                    const row = document.createElement('tr');
+                    const row = document.createElement("tr");
                     row.innerHTML = '<td colspan="3">An error occurred</td>';
-                    document.getElementById('resultsTableBody').appendChild(row);
+                    document.getElementById("resultsTableBody").appendChild(row);
                 });
         }
     </script>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                       Với template. sẽ phụ thuộc vào cột <b>`status`</b>, 
+                       với status = <b>Update</b> thì hệ thống sẽ update dữ liệu 
+                       storeId, lat, long, winnerRelationship, posmId,
+                       question1, question2, question3, question4, question5,
+                       description, các hình.
+                       <br>
+                       Với status = <b>các trạng thái cửa hàng<b>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
