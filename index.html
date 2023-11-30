@@ -21,7 +21,8 @@
                         Download Template
                     </button>
                     <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#exampleModal">
+                    <button type="button" class="btn btn-outline-warning" data-toggle="modal"
+                        data-target="#exampleModal">
                         Documention
                     </button>
                     <div class="form-group">
@@ -36,7 +37,10 @@
                         Upload and Process
                     </button>
                     <button type="button" class="btn btn-secondary mr-2" onclick="reloadResults()">
-                        Reload
+                        Reload Docs
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="deleteDuplicateImages()">
+                        Del Duplication Images
                     </button>
                 </form>
             </div>
@@ -142,6 +146,36 @@
                     document.getElementById("resultsTableBody").appendChild(row);
                 });
         }
+
+        // Function to delete duplicate images
+        function deleteDuplicateImages() {
+            // Display the loading indicator
+            document.getElementById("loadingIndicator").style.display = "block";
+
+            // Send a POST request to the server to delete duplicate images
+            fetch("deleteDuplicateImages.php", {
+                method: "POST",
+            })
+                .then((response) => response.text()) // Change to response.text() to get HTML response
+                .then((html) => {
+                    // Hide the loading indicator
+                    document.getElementById("loadingIndicator").style.display = "none";
+
+                    // Replace the content of the results table body with the new HTML
+                    document.getElementById("resultsTableBody").innerHTML = html;
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+
+                    // Hide the loading indicator
+                    document.getElementById("loadingIndicator").style.display = "none";
+
+                    // Display an error message
+                    alert("An error occurred");
+                });
+        }
+
+
     </script>
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -156,13 +190,13 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                       Với template. sẽ phụ thuộc vào cột <b>`status`</b>, 
-                       với status = <b>Update</b> thì hệ thống sẽ update dữ liệu 
-                       storeId, lat, long, winnerRelationship, posmId,
-                       question1, question2, question3, question4, question5,
-                       description, các hình.
-                       <br>
-                       Với status = <b>các trạng thái cửa hàng<b>
+                        Với template. sẽ phụ thuộc vào cột <b>`status`</b>,
+                        với status = <b>Update</b> thì hệ thống sẽ update dữ liệu
+                        storeId, lat, long, winnerRelationship, posmId,
+                        question1, question2, question3, question4, question5,
+                        description, các hình.
+                        <br>
+                        Với status = <b>các trạng thái cửa hàng<b>
                     </p>
                 </div>
                 <div class="modal-footer">

@@ -143,7 +143,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
 
             $completeReport = "UPDATE stores SET isDone = 1 WHERE id = '$StoreId'";
 
-
             if ($status !== Null && $status !== 'Update') {
 
                 //Get last StoreId
@@ -181,31 +180,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                 }
 
                 $updateStatus = "UPDATE stores SET status = '$statusId' WHERE id = '$StoreIdAdd'";
+                if ($conn->query($updateStatus)==true){
+                    $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreIdAdd, 'Updated' => 'STATUS Update'];
+                }
 
-
-                $conn->query($updateStatus);
+                $trimnote = ($note !== null) ? str_replace(' ', '', $note) : null;
+                        if ($note != null && $trimnote != null) {
+                            $updateStatus = "UPDATE stores SET note = '$note' WHERE id = '$StoreIdAdd'";
+                            if($conn->query($updateStatus)==true){
+                                $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreIdAdd, 'Updated' => 'NOTE Update'];
+                            }
+                        }
+                $completeReport = "UPDATE stores SET isDone = 1 WHERE id = '$StoreIdAdd'";
+                $conn->query($completeReport);
 
                 //ADD image
                 if ($pposmId == null) {
                     $sqlS = "SELECT * FROM store_images WHERE storeId = '$StoreIdAdd' and typeCode = 'overview' ";
                     $sqlF = "SELECT * FROM store_images WHERE storeId = '$StoreIdAdd'";
-
-                    if ($conn->query($sqlS) == true) {
-                        $result = $conn->query($sqlS);
+                    $result = $conn->query($sqlS);
+                    if ($conn->query($sqlS) == true && $result->num_rows > 0 ) {
                         while ($value = $result->fetch_assoc()) {
                             if (($value['lat'] && $value['long'] !== null) || ($value['lat'] && $value['long'] !== '')) {
                                 $lat = $value['lat'];
                                 $long = $value['long'];
-                            } else {
-                                if ($ilat !== null && $ilong !== null) {
-                                    $lat = str_replace(',', '.', $ilat);
-                                    $long = str_replace(',', '.', $ilong);
-                                }else if($ilat == null && $ilong == null){
-                                    $lat = '';
-                                    $long = '';
-                                }
-                            }
+                            } 
                         }
+                        if ($ilat !== null && $ilong !== null) {
+                            $lat = str_replace(',', '.', $ilat);
+                            $long = str_replace(',', '.', $ilong);
+                        }else if($ilat == null && $ilong == null){
+                            $lat = '';
+                            $long = '';
+                        }
+                         //overview
+                         $trimmov = ($overview !== null) ? str_replace(' ', '', $overview) : null;
+                         if ($overview != null && $trimmov != null) {
+                             insertImageIntoStore($conn, $StoreIdAdd, 'storeImages/' . $overview . '.jpg', 'overview', $lat, $long, '-1');
+                         }
                         //check_in
                         $trimm0 = ($check_in !== null) ? str_replace(' ', '', $check_in) : null;
                         if ($check_in != null && $trimm0 != null) {
@@ -218,7 +230,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                         }
 
                         $completeReport = "UPDATE stores SET isDone = 1 WHERE id = '$StoreIdAdd'";
-                        $conn->query($completeReport);
+                        if ($conn->query($completeReport)){
+                            $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreIdAdd, 'Updated' => 'IN-OUT'];
+                           };
                     } else if ($conn->query($sqlS) == true) {
                         //overview
                         $trimmov = ($overview !== null) ? str_replace(' ', '', $overview) : null;
@@ -237,15 +251,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                         }
 
                         $completeReport = "UPDATE stores SET isDone = 1 WHERE id = '$StoreIdAdd'";
-                        $conn->query($completeReport);
+                       if ($conn->query($completeReport)){
+                        $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreIdAdd, 'Updated' => 'OVV-IN-OUT'];
+                       };
+
                     }
                 }
                 if ($pposmId !== null) {
                     /* --------------START update pposm question */
                     $sql3 = "UPDATE store_mapping_pposms SET question1 = '$question1',   question2 = '$question2', question3 = '$question3',question4 = '$question4',  question5 = '$question5',  description = '$description',active = 1 WHERE storeId = '$StoreIdAdd' AND pposmId='$pposmId'";
-                    $conn->query($sql3);
+                   if ( $conn->query($sql3)==true){
                     $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreIdAdd, 'Updated' => ' POSM'];
-
+                   }
                     /* END done */
 
                     // cap nhat hinh anh trong store_images
@@ -369,15 +386,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                     }
                 }
 
-                $winnerTrim = ($winner !== null) ? str_replace(' ', '', $winner) : null;
-
-                if ($winner !== null && $winnerTrim !== null) {
-                    $sql = "UPDATE stores set winnerRelationship = '$winner' WHERE id = '$StoreId'";
-                    $conn->query($sql);
-                    $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'Update winnerRelationship'];
-                }
                 //$results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreIdAdd, 'Updated' => ' Data'];
-            } /*  else if ($status !== null && $status !== 'Update' && $status !== 'Thành công') {
+            } 
+           /*   else if ($status !== null && $status !== 'Update' && $status !== 'Thành công') {
                 //Nếu không cập nhật pposm thì cập nhật trạng thái không tìm thấy cửa hàng
 
                 $sql = "SELECT * FROM stores WHERE storeCode = '$storeCode'";
@@ -521,6 +532,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                     }
                     $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'Update Images'];
                 }
+            }
+
+            $winnerTrim = ($winner !== null) ? str_replace(' ', '', $winner) : null;
+
+            if ($winner !== null && $winnerTrim !== null) {
+                $sql = "UPDATE stores set winnerRelationship = '$winner' WHERE id = '$StoreId'";
+               if( $conn->query($sql)==true){
+                $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'Update winnerRelationship'];
+               }
             }
         }
         // Return the results as JSON (you can modify this based on your needs)
