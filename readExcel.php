@@ -326,7 +326,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
 
                         $conn->query($completeReport);
                         $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreIdAdd, 'Updated' => 'ImageOVV'];
-                    } else if ($conn->query($sql5) == true && $result5->num_rows > 0) {
+
+                    } else if ($conn->query($sql5) == true ) {
 
                         $trimmov = ($overview !== null) ? str_replace(' ', '', $overview) : null;
                         if ($overview != null && $trimmov != null) {
