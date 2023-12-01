@@ -19,8 +19,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
         $reader = new Xlsx();
         $spreadsheet = $reader->load($tempFilePath); // Thay tên tệp Excel thực tế của bạn
 
-        // Lấy sheet hoạt động
-        $sheet = $spreadsheet->getActiveSheet();
+        // Lấy sheet theo tên Sheet
+        $sheetName = 'MAIN';
+        $sheet = $spreadsheet->getSheetByName($sheetName);
 
         // Đọc hàng header 
         $headerRow = $sheet->getRowIterator(1)->current();
@@ -326,8 +327,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
 
                         $conn->query($completeReport);
                         $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreIdAdd, 'Updated' => 'ImageOVV'];
-
-                    } else if ($conn->query($sql5) == true ) {
+                    } else if ($conn->query($sql5) == true) {
 
                         $trimmov = ($overview !== null) ? str_replace(' ', '', $overview) : null;
                         if ($overview != null && $trimmov != null) {
@@ -380,7 +380,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
 
                 //$results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreIdAdd, 'Updated' => ' Data'];
             }
-           
+
             if ($status === 'Update') {
 
                 if ($ilat !== null && $ilong !== null) {
@@ -500,8 +500,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                     }
                 }
             }
-
-           
         }
         // Return the results as JSON (you can modify this based on your needs)
         header('Content-Type: application/json');
