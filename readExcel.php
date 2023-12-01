@@ -406,7 +406,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
 
                     $sql_posm = "SELECT * FROM store_mapping_pposms WHERE storeId = '$StoreId' AND pposmId = '$pposmId'";
                     if ($conn->query($sql_posm) == TRUE) {
-                        $completePOSM = "UPDATE store_mapping_pposms SET active = 0 WHERE storeId = '$StoreId' AND pposmId = '$pposmId'";
+                        $completePOSM = "UPDATE store_mapping_pposms SET active = 1 WHERE storeId = '$StoreId' AND pposmId = '$pposmId'";
                         $conn->query($completePOSM);
 
                         $trimm1 = ($question1 !== null) ? str_replace(' ', '', $question1) : null;
