@@ -484,14 +484,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                 }
             }
 
-            $winnerTrim = ($winner !== null) ? str_replace(' ', '', $winner) : null;
+            $sql = "SELECT * FROM stores WHERE storeCode = '$storeCode'";
+            $result = $conn->query($sql);
+            if ($result->num_rows > 0) {
+                while ($value = $result->fetch_assoc()) {
+                    $StoreIdWinner = $value['id'];
+                }
+                $winnerTrim = ($winner !== null) ? str_replace(' ', '', $winner) : null;
 
-            if ($winner !== null && $winnerTrim !== null) {
-                $sql = "UPDATE stores set winnerRelationship = '$winner' WHERE id = '$StoreId'";
-                if ($conn->query($sql) == true) {
-                    $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'Update winnerRelationship'];
+                if ($winner !== null && $winnerTrim !== null) {
+                    $sql = "UPDATE stores set winnerRelationship = '$winner' WHERE id = '$StoreIdWinner'";
+                    if ($conn->query($sql) == true) {
+                        $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreIdWinner, 'Updated' => 'Update winnerRelationship'];
+                    }
                 }
             }
+
+           
         }
         // Return the results as JSON (you can modify this based on your needs)
         header('Content-Type: application/json');
