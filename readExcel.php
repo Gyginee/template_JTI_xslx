@@ -259,6 +259,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                     }
                 }
                 if ($pposmId !== null) {
+
                     /* --------------START update pposm question */
                     $sql3 = "UPDATE store_mapping_pposms SET question1 = '$question1',   question2 = '$question2', question3 = '$question3',question4 = '$question4',  question5 = '$question5',  description = '$description',active = 1 WHERE storeId = '$StoreIdAdd' AND pposmId='$pposmId'";
                     if ($conn->query($sql3) == true) {
@@ -402,14 +403,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                     $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'Update winnerRelationship'];
                 }
 
+                $trimnote = ($note !== null) ? str_replace(' ', '', $note) : null;
+                if ($note != null && $trimnote != null) {
+                    $updateStatus = "UPDATE stores SET note = '$note' WHERE id = '$StoreId'";
+                    if ($conn->query($updateStatus) == true) {
+                        $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'NOTE Update'];
+                    }
+                }
+
 
                 if ($pposmId !== null) {
 
                     $sql_posm = "SELECT * FROM store_mapping_pposms WHERE storeId = '$StoreId' AND pposmId = '$pposmId'";
                     if ($conn->query($sql_posm) == TRUE) {
-                        $completePOSM = "UPDATE store_mapping_pposms SET active = 1 WHERE storeId = '$StoreId' AND pposmId = '$pposmId'";
-                        $conn->query($completePOSM);
-
                         $trimm1 = ($question1 !== null) ? str_replace(' ', '', $question1) : null;
                         $trimm2 = ($question2 !== null) ? str_replace(' ', '', $question2) : null;
                         $trimm3 = ($question3 !== null) ? str_replace(' ', '', $question3) : null;
@@ -426,10 +432,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                             ($question5 !== null && $trimm5 !== null) ||
                             ($description !== null && $trimDescription !== null)
                         ) {
-
                             updatePosm($conn, $StoreId, $pposmId, $question1, $question2, $question3, $question4, $question5, $description);
+                            $completePOSM = "UPDATE store_mapping_pposms SET active = 1 WHERE storeId = '$StoreId' AND pposmId = '$pposmId'";
+                            $conn->query($completePOSM);
                         }
                         $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'Update Posm'];
+                    }
+
+                    $sql = "SELECT * FROM store_images WHERE storeId = '$StoreId'";
+                    if ($conn->query($sql) == TRUE) {
+                        //posm1
+                        $trimm2 = ($posm1 !== null) ? str_replace(' ', '', $posm1) : null;
+                        if ($posm1 != null && $trimm2 != null) {
+                            insertImageIntoStore($conn, $StoreId, 'storeImages/' . $posm1 . '.jpg', 'posm', $lat, $long, $pposmId);
+                        }
+                        //posm2
+                        $trimm3 = ($posm2 !== null) ? str_replace(' ', '', $posm2) : null;
+                        if ($posm2 != null && $trimm3 != null) {
+                            insertImageIntoStore($conn, $StoreId, 'storeImages/' . $posm2 . '.jpg', 'posm', $lat, $long, $pposmId);
+                        }
                     }
                 }
 

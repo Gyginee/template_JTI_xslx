@@ -42,9 +42,12 @@
                     <button type="button" class="btn btn-danger" onclick="deleteDuplicateImages()">
                         Del Duplication Images
                     </button>
-                    <button type="button" class="btn btn-primary" onclick="hideReport()">
+                    <button type="button" class="btn btn-info" onclick="hideReport()">
                        Hide Store
                     </button>
+                    <button type="button" class="btn btn-warning" onclick="note()">
+                       Note POSM & Image
+                     </button>
                 </form>
             </div>
         </div>
@@ -228,7 +231,57 @@
                     document.getElementById("resultsTableBody").appendChild(row);
                 });
         }
+        function note() {
+            // Display the loading indicator
+            document.getElementById("loadingIndicator").style.display = "block";
 
+            // Get the form data
+            const formData = new FormData(document.querySelector("form"));
+
+            // Send a POST request to the server
+            fetch("note.php", {
+                method: "POST",
+                body: formData,
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    // Hide the loading indicator
+                    document.getElementById("loadingIndicator").style.display = "none";
+
+                    // Clear the table
+                    document.getElementById("resultsTableBody").innerHTML = "";
+
+                    // Check if there are results
+                    if (data.length > 0) {
+                        // Loop through the results and append rows to the table
+                        data.forEach((result) => {
+                            const row = document.createElement("tr");
+                            row.innerHTML = `
+                    <td>${result.storeCode}</td>
+                    <td>${result.StoreId}</td>
+                    <td>${result.Updated}</td>
+                `;
+                            document.getElementById("resultsTableBody").appendChild(row);
+                        });
+                    } else {
+                        // If no results, display a message in the table
+                        const row = document.createElement("tr");
+                        row.innerHTML = '<td colspan="3">No results found</td>';
+                        document.getElementById("resultsTableBody").appendChild(row);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+
+                    // Hide the loading indicator
+                    document.getElementById("loadingIndicator").style.display = "none";
+
+                    // Display an error message in the table
+                    const row = document.createElement("tr");
+                    row.innerHTML = '<td colspan="3">An error occurred</td>';
+                    document.getElementById("resultsTableBody").appendChild(row);
+                });
+        }
 
     </script>
     <!-- Modal -->
