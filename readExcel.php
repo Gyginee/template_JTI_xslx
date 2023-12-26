@@ -129,7 +129,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
             $status = $sheet->getCell($columns['STATUS'] . $row)->getValue();
             $note = $sheet->getCell($columns['NOTE'] . $row)->getValue();
             $winner = $sheet->getCell($columns['winnerRelationship'] . $row)->getValue();
-
+            $name = $sheet->getCell($columns['TEN'] . $row)->getValue();
+            $stk = $sheet->getCell($columns['STK'] . $row)->getValue();
+            $nganhang = $sheet->getCell($columns['NGANHANG'] . $row)->getValue();
             //Lấy StoreId 
             $sql = "SELECT * FROM stores WHERE storeCode = '$storeCode' AND status IS NOT NULL";
             $result = $conn->query($sql);
@@ -200,6 +202,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                         $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreIdAdd, 'Updated' => 'NOTE Update'];
                     }
                 }
+
                 $completeReport = "UPDATE stores SET isDone = 1 WHERE id = '$StoreIdAdd'";
                 $conn->query($completeReport);
 
@@ -230,6 +233,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                         if ($check_out != null && $trimm1 != null) {
                             insertImageIntoStore($conn, $StoreIdAdd, 'storeImages/' . $check_out . '.jpg', 'check_out', $lat, $long, '-1');
                         }
+                        //fee_info
+                        $trimm4 = ($fee_info1 !== null) ? str_replace(' ', '', $fee_info1) : null;
+                        if ($fee_info1 != null && $trimm4 != null) {
+                            insertImageIntoStore($conn, $StoreIdAdd, 'storeImages/' . $fee_info1 . '.jpg', 'fee_info', $lat, $long, '-1');
+                        }
+                        //fee_info
+                        $trimm5 = ($fee_info2 !== null) ? str_replace(' ', '', $fee_info2) : null;
+                        if ($fee_info2 != null && $trimm5 != null) {
+                            insertImageIntoStore($conn, $StoreIdAdd, 'storeImages/' . $fee_info2 . '.jpg', 'fee_info', $lat, $long, '-1');
+                        }
+                        //hotzone
+                        $trimm6 = ($hotzone1 !== null) ? str_replace(' ', '', $hotzone1) : null;
+                        if ($hotzone1 != null && $trimm6 != null) {
+                            insertImageIntoStore($conn, $StoreIdAdd, 'storeImages/' . $hotzone1 . '.jpg', 'hot_zone', $lat, $long, '-1');
+                        }
+                        //hotzone
+                        $trimm7 = ($hotzone2 !== null) ? str_replace(' ', '', $hotzone2) : null;
+                        if ($hotzone2 != null && $trimm7 != null) {
+                            insertImageIntoStore($conn, $StoreIdAdd, 'storeImages/' . $hotzone2 . '.jpg', 'hot_zone', $lat, $long, '-1');
+                        }
 
                         $completeReport = "UPDATE stores SET isDone = 1 WHERE id = '$StoreIdAdd'";
                         if ($conn->query($completeReport)) {
@@ -250,6 +273,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                         $trimm1 = ($check_out !== null) ? str_replace(' ', '', $check_out) : null;
                         if ($check_out != null && $trimm1 != null) {
                             insertImageIntoStore($conn, $StoreIdAdd, 'storeImages/' . $check_out . '.jpg', 'check_out', $lat, $long, '-1');
+                        }
+                        //fee_info
+                        $trimm4 = ($fee_info1 !== null) ? str_replace(' ', '', $fee_info1) : null;
+                        if ($fee_info1 != null && $trimm4 != null) {
+                            insertImageIntoStore($conn, $StoreIdAdd, 'storeImages/' . $fee_info1 . '.jpg', 'fee_info', $lat, $long, '-1');
+                        }
+                        //fee_info
+                        $trimm5 = ($fee_info2 !== null) ? str_replace(' ', '', $fee_info2) : null;
+                        if ($fee_info2 != null && $trimm5 != null) {
+                            insertImageIntoStore($conn, $StoreIdAdd, 'storeImages/' . $fee_info2 . '.jpg', 'fee_info', $lat, $long, '-1');
+                        }
+                        //hotzone
+                        $trimm6 = ($hotzone1 !== null) ? str_replace(' ', '', $hotzone1) : null;
+                        if ($hotzone1 != null && $trimm6 != null) {
+                            insertImageIntoStore($conn, $StoreIdAdd, 'storeImages/' . $hotzone1 . '.jpg', 'hot_zone', $lat, $long, '-1');
+                        }
+                        //hotzone
+                        $trimm7 = ($hotzone2 !== null) ? str_replace(' ', '', $hotzone2) : null;
+                        if ($hotzone2 != null && $trimm7 != null) {
+                            insertImageIntoStore($conn, $StoreIdAdd, 'storeImages/' . $hotzone2 . '.jpg', 'hot_zone', $lat, $long, '-1');
                         }
 
                         $completeReport = "UPDATE stores SET isDone = 1 WHERE id = '$StoreIdAdd'";
@@ -411,6 +454,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                     }
                 }
 
+                $trimname = ($name !== null) ? str_replace(' ', '', $name) : null;
+                if ($name != null && $trimname != null) {
+                    $updateStatus = "UPDATE stores SET winnerName = '$name' WHERE id = '$StoreId'";
+                    if ($conn->query($updateStatus) == true) {
+                        $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'name Update'];
+                    }
+                }
+
+
+                $trimstk = ($stk !== null) ? str_replace(' ', '', $stk) : null;
+                if ($stk != null && $trimstk != null) {
+                    $updateStatus = "UPDATE stores SET winnerBankNumber = '$stk' WHERE id = '$StoreId'";
+                    if ($conn->query($updateStatus) == true) {
+                        $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'STK Update'];
+                    }
+                }
+
+                $trimnganhang = ($nganhang !== null) ? str_replace(' ', '', $nganhang) : null;
+                if ($nganhang != null && $trimnganhang != null) {
+                    $updateStatus = "UPDATE stores SET winnerBankName = '$nganhang' WHERE id = '$StoreId'";
+                    if ($conn->query($updateStatus) == true) {
+                        $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'NganHang Update'];
+                    }
+                }
+
+
+
 
                 if ($pposmId !== null) {
 
@@ -500,7 +570,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
                     //hotzone
                     $trimm7 = ($hotzone2 !== null) ? str_replace(' ', '', $hotzone2) : null;
                     if ($hotzone2 != null && $trimm7 != null) {
-                        insertImageIntoStore($conn, $StoreId, 'storeImages/' . $hotzone2 . '.jpg', 'hotzone', $lat, $long, '-1');
+                        insertImageIntoStore($conn, $StoreId, 'storeImages/' . $hotzone2 . '.jpg', 'hot_zone', $lat, $long, '-1');
                     }
                     $results[] = ['storeCode' => $storeCode, 'StoreId' => $StoreId, 'Updated' => 'Update Images'];
                 }

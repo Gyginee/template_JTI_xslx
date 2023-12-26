@@ -98,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["excelFile"])) {
 
             $storeCode = $sheet->getCell($columns['storeCode'] . $row)->getValue();
             $pposmId = $sheet->getCell($columns['pposmId'] . $row)->getValue();
-            $img = $sheet->getCell($columns['img'] . $row)->getValue();
+            $img = $sheet->getCell($columns['Image'] . $row)->getValue();
             $note = $sheet->getCell($columns['NOTE'] . $row)->getValue();
 
             //Lấy StoreId 
